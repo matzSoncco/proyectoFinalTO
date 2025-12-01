@@ -1,9 +1,15 @@
-cmake_minimum_required(VERSION 3.10)
-project(SimuladorEvacuacion VERSION 1.0)
+cmake_minimum_required(VERSION 3.16)
+project(SimuladorEvacuacion VERSION 1.0 LANGUAGES CXX)
 
 # Especificar el estándar de C++
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 
 # Directorios de include
 include_directories(${PROJECT_SOURCE_DIR}/include)
@@ -22,7 +28,9 @@ set(SOURCES
 )
 
 # Crear ejecutable
-add_executable(simulador_agentes ${SOURCES})
+add_executable(simulador_agentes WIN32 ${SOURCES})
+
+target_link_libraries(simulador_agentes PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets)
 
 # Opciones de compilación
 if(MSVC)
