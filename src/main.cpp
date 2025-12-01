@@ -1,4 +1,6 @@
 #include <QCoreApplication>
+#include <QApplication>
+#include "../include/VentanaPrincipal.h"
 #include <QTimer>
 #include <QDebug>
 #include <iostream>
@@ -99,4 +101,15 @@ int main(int argc, char *argv[])
     miSimulador->iniciar();
 
     return a.exec(); // Arranca el bucle de eventos de Qt
+
+    QApplication app(argc, argv);
+
+    // Configurar estilo de la aplicación
+    app.setStyle("Fusion");
+
+    // Crear y mostrar la ventana principal
+    VentanaPrincipal ventana;
+    ventana.show();
+
+    return app.exec();
 }
