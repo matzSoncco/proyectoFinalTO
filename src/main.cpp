@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
     // ESTE ES EL ÚNICO LOOP QT PERMITIDO QUE TRABAJAMOS
     QApplication app(argc, argv);
 
+    /*
     std::cout << "========================================\n";
     std::cout << "  SIMULADOR INTEGRADO: MOTOR + AGENTES  \n";
     std::cout << "========================================\n\n";
@@ -31,7 +32,7 @@ int main(int argc, char *argv[])
     // 1. CONFIGURACIÓN DEL MOTOR
     // ---------------------------------------------------------
     std::cout << "[MOTOR] Inicializando Simulador y Escenario...\n";
-
+    /*
     Simulador* miSimulador = new Simulador(&app);
 
     // Mapa 20x20
@@ -85,7 +86,7 @@ int main(int argc, char *argv[])
     // Iniciar motor
     std::cout << "[MOTOR] Iniciando QTimer...\n";
     miSimulador->iniciar();
-
+    */
     // ---------------------------------------------------------
     // 4. INICIAR EL GUI
     // ---------------------------------------------------------
