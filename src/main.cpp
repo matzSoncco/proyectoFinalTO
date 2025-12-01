@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     // 1. CONFIGURACIÓN DEL MOTOR
     // ---------------------------------------------------------
     std::cout << "[MOTOR] Inicializando Simulador y Escenario...\n";
-    /*
+
     Simulador* miSimulador = new Simulador(&app);
 
     // Mapa 20x20
