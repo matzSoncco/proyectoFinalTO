@@ -1,0 +1,26 @@
+# Archivos generados por el compilador (NO subir)
+*.o
+*.a
+*.obj
+*.exe
+*.lib
+*.dll
+*.so
+
+# Directorios de compilación (Debug y Release)
+.qtcreator/
+build/
+debug/
+release/
+
+# Archivos de configuración de usuario de Qt Creator/Visual Studio (Cambian por persona)
+*.pro.user
+*.vcxproj.user
+*.sln.user
+qmlcache/
+*~
+
+# Archivos generados por el moc (Meta-Object Compiler)
+moc_*.cpp
+ui_*.h
+qrc_*.cpp

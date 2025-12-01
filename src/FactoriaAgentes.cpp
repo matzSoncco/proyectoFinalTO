@@ -1,14 +1,11 @@
 #include "../include/FactoriaAgentes.h"
 #include <random>
+#include <cmath> // Necesario para cos, sin
 
 // Inicializar contador estático
 int FactoriaAgentes::contadorId = 0;
 
-/**
- * Constructor
- */
 FactoriaAgentes::FactoriaAgentes() {
-    // Crear algunos prototipos por defecto
     auto personaNormal = std::make_shared<Persona>(0, Posicion(0, 0), 30, false);
     registrarPrototipo("PersonaNormal", personaNormal);
     
@@ -22,32 +19,20 @@ FactoriaAgentes::FactoriaAgentes() {
     registrarPrototipo("Rescatista", rescatista);
 }
 
-/**
- * Crea una nueva persona con parámetros específicos
- */
 std::shared_ptr<Persona> FactoriaAgentes::crearPersona(Posicion pos, int edad, bool movilidadReducida) {
     int nuevoId = obtenerSiguienteId();
     return std::make_shared<Persona>(nuevoId, pos, edad, movilidadReducida);
 }
 
-/**
- * Crea un nuevo rescatista
- */
 std::shared_ptr<Rescatista> FactoriaAgentes::crearRescatista(Posicion pos) {
     int nuevoId = obtenerSiguienteId();
     return std::make_shared<Rescatista>(nuevoId, pos);
 }
 
-/**
- * Registra un prototipo para clonación posterior
- */
 void FactoriaAgentes::registrarPrototipo(const std::string& nombre, std::shared_ptr<AgenteBase> prototipo) {
     prototipos[nombre] = prototipo;
 }
 
-/**
- * Clona un agente a partir de un prototipo registrado
- */
 std::shared_ptr<AgenteBase> FactoriaAgentes::clonarDesdePrototipo(const std::string& nombre, Posicion nuevaPos) {
     auto it = prototipos.find(nombre);
     if (it != prototipos.end()) {
@@ -58,9 +43,6 @@ std::shared_ptr<AgenteBase> FactoriaAgentes::clonarDesdePrototipo(const std::str
     return nullptr;
 }
 
-/**
- * Crea múltiples personas con características similares
- */
 std::vector<std::shared_ptr<Persona>> FactoriaAgentes::crearGrupoPersonas(
     int cantidad, 
     Posicion posInicial, 
@@ -70,7 +52,6 @@ std::vector<std::shared_ptr<Persona>> FactoriaAgentes::crearGrupoPersonas(
     std::vector<std::shared_ptr<Persona>> grupo;
     grupo.reserve(cantidad);
     
-    // Generador de números aleatorios
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> disAngulo(0, 2 * 3.14159265359);
@@ -79,21 +60,19 @@ std::vector<std::shared_ptr<Persona>> FactoriaAgentes::crearGrupoPersonas(
     std::uniform_real_distribution<> disProbabilidad(0.0, 1.0);
     
     for (int i = 0; i < cantidad; ++i) {
-        // Generar posición aleatoria dentro del radio
         double angulo = disAngulo(gen);
         double radio = disRadio(gen);
-        Posicion pos(
-            posInicial.x + radio * std::cos(angulo),
-            posInicial.y + radio * std::sin(angulo)
-        );
         
-        // Generar edad aleatoria
+        // CORRECCIÓN MATEMÁTICA: QPoint usa enteros.
+        // Convertimos el cálculo trigonométrico a entero para la grid.
+        int nuevoX = static_cast<int>(posInicial.x() + radio * std::cos(angulo));
+        int nuevoY = static_cast<int>(posInicial.y() + radio * std::sin(angulo));
+        
+        Posicion pos(nuevoX, nuevoY);
+        
         int edad = disEdad(gen);
-        
-        // 10% de probabilidad de tener movilidad reducida
         bool movilidadReducida = (disProbabilidad(gen) < 0.1);
         
-        // Crear persona
         auto persona = crearPersona(pos, edad, movilidadReducida);
         grupo.push_back(persona);
     }
@@ -101,9 +80,6 @@ std::vector<std::shared_ptr<Persona>> FactoriaAgentes::crearGrupoPersonas(
     return grupo;
 }
 
-/**
- * Obtiene el siguiente ID disponible
- */
 int FactoriaAgentes::obtenerSiguienteId() {
     return ++contadorId;
 }

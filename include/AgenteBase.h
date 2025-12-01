@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <QPoint>
 
 /**
  * @brief Enumeración para los diferentes estados de un agente
@@ -26,19 +27,7 @@ enum class TipoComportamiento {
     RESCATISTA
 };
 
-/**
- * @brief Estructura para representar una posición en el plano
- */
-struct Posicion {
-    double x;
-    double y;
-    
-    Posicion(double x = 0.0, double y = 0.0) : x(x), y(y) {}
-    
-    double distancia(const Posicion& otra) const {
-        return std::sqrt((x - otra.x) * (x - otra.x) + (y - otra.y) * (y - otra.y));
-    }
-};
+typedef QPoint Posicion;
 
 // Forward declaration para el patrón Observer
 class ObservadorEvento;

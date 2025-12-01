@@ -1,4 +1,4 @@
-#include "Escenario.h"
+#include "../include/Escenario.h"
 #include <cmath>
 #include <limits>
 

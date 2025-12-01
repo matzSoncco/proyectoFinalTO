@@ -25,6 +25,15 @@ set(SOURCES
     src/Escenario.cpp
     src/Simulador.cpp
     src/PathFinder.cpp
+
+    include/Simulador.h
+    include/AgenteBase.h
+    include/Escenario.h
+    include/PathFinder.h
+    include/Persona.h
+    include/Rescatista.h
+    include/ObservadorEvento.h
+    include/FactoriaAgentes.h
 )
 
 # Crear ejecutable

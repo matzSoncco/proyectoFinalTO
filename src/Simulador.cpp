@@ -1,18 +1,14 @@
-#include "Simulador.h"
-#include <QDebug> // Para imprimir en consola
+#include "../include/Simulador.h"
+#include <QDebug> 
 
 Simulador::Simulador(QObject *parent) : QObject(parent), escenario(nullptr) {
     timer = new QTimer(this);
     esActivo = false;
-
-    //conectamos el reloj a tu función loopPrincipal
     connect(timer, &QTimer::timeout, this, &Simulador::loopPrincipal);
 }
 
 Simulador::~Simulador() {
     delete escenario;
-    //los agentes se deberían limpiar aquí o en el destructor de la ventana,
-    //pero por ahora limpiamos el escenario
 }
 
 void Simulador::cargarEscenario(int filas, int cols) {
@@ -30,7 +26,7 @@ void Simulador::iniciar() {
         return;
     }
     esActivo = true;
-    timer->start(500); //500ms = medio segundo por paso
+    timer->start(500); 
     qDebug() << "Simulación iniciada.";
 }
 
@@ -49,30 +45,31 @@ void Simulador::loopPrincipal() {
     for (AgenteBase* agente : agentes) {
         QPoint posActual = agente->getPosicion();
         
-        //verificar si ya llegó a la salida
+        // 1. Verificar si ya llegó a la salida
+        // Usamos .x() y .y() por ser QPoint
         if (escenario->esSalida(posActual.x(), posActual.y())) {
             agentesEnSalida++;
-            continue; //no se mueve más
+            continue; 
         }
 
-        //buscar la salida más cercana
+        // 2. Buscar salida y calcular ruta
         QPoint salida = escenario->getSalidaMasCercana(posActual);
-
-        //calcular el siguiente paso usando PathFinder
         QPoint siguientePaso = PathFinder::calcularSiguientePaso(escenario, posActual, salida);
 
-        //mover al agente
+        // 3. Mover al agente
         if (siguientePaso != posActual) {
             agente->setPosicion(siguientePaso);
-            alguienSeMovio = true;
+            alguienSeMovio = true; // CORRECCIÓN: Ahora esta variable es útil
         }
     }
 
-    //notificar a la GUI que hubo cambios
-    emit mundoActualizado();
+    // CORRECCIÓN: Solo notificamos a la GUI si realmente hubo cambios (Optimización)
+    if (alguienSeMovio) {
+        emit mundoActualizado();
+    }
 
-    //verificar condición de término
-    if (agentesEnSalida == agentes.size()) {
+    // CORRECCIÓN: Casting para evitar warning de signed/unsigned
+    if (agentesEnSalida == (int)agentes.size()) {
         pausar();
         emit simulacionTerminada();
         qDebug() << "Todos los agentes han evacuado.";

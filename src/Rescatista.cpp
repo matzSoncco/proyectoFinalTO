@@ -1,6 +1,7 @@
 #include "../include/Rescatista.h"
 #include "../include/Persona.h"
 #include <cmath>
+#include <algorithm> // Para std::max o lógica adicional si se requiere
 
 /**
  * Constructor de Rescatista
@@ -9,7 +10,6 @@ Rescatista::Rescatista(int id, Posicion posInicial)
     : AgenteBase(id, posInicial, 2.5, TipoComportamiento::RESCATISTA),
       estaAsistiendo(false),
       capacidadCarga(0.7) {
-    // Los rescatistas son más rápidos que las personas normales
 }
 
 /**
@@ -51,8 +51,6 @@ double Rescatista::calcularVelocidadEfectiva() const {
  * Define cómo reacciona el rescatista ante un obstáculo
  */
 void Rescatista::reaccionarObstaculo() {
-    // Los rescatistas no entran en pánico
-    // Simplemente buscan rutas alternativas (esto se manejará en el algoritmo de ruteo)
     notificarEvento("RESCATISTA_OBSTACULO");
 }
 
@@ -74,7 +72,6 @@ void Rescatista::asistirPersona(std::shared_ptr<Persona> persona) {
     personaAsistida = persona;
     estaAsistiendo = true;
     
-    // Notificar que está asistiendo
     notificarEvento("ASISTIENDO_PERSONA");
 }
 
@@ -85,7 +82,6 @@ void Rescatista::liberarPersona() {
     if (estaAsistiendo) {
         auto persona = personaAsistida.lock();
         if (persona) {
-            // Reducir el pánico de la persona asistida
             persona->reducirPanico(0.5);
         }
         estaAsistiendo = false;
@@ -98,7 +94,6 @@ void Rescatista::liberarPersona() {
  * Busca personas cercanas que necesiten asistencia
  */
 void Rescatista::buscarPersonasQueNecesitanAyuda(const std::vector<std::shared_ptr<AgenteBase>>& agentes) {
-    // Si ya está asistiendo, no buscar más
     if (estaAsistiendo) {
         return;
     }
@@ -116,7 +111,11 @@ void Rescatista::buscarPersonasQueNecesitanAyuda(const std::vector<std::shared_p
              persona->estEnPanico() || 
              persona->getEstado() == EstadoAgente::BLOQUEADO)) {
             
-            double dist = posicion.distancia(persona->getPosicion());
+            // CORRECCIÓN MATEMÁTICA: Usamos hypot para calcular distancia entre QPoints
+            // QPoint usa .x() y .y(), no .x y .y
+            double dx = posicion.x() - persona->getPosicion().x();
+            double dy = posicion.y() - persona->getPosicion().y();
+            double dist = std::hypot(dx, dy);
             
             if (dist < distanciaMinima) {
                 distanciaMinima = dist;
@@ -125,7 +124,6 @@ void Rescatista::buscarPersonasQueNecesitanAyuda(const std::vector<std::shared_p
         }
     }
     
-    // Si encontró alguien que necesita ayuda, ir a asistir
     if (personaMasCercana) {
         asistirPersona(personaMasCercana);
     }
