@@ -35,7 +35,7 @@ void VistaEscenario::setEscenario(Escenario* esc) {
     update();
 }
 
-void VistaEscenario::setAgentes(const std::vector<AgenteBase*>* ags) {
+void VistaEscenario::setAgentes(const std::vector<std::shared_ptr<AgenteBase>>* ags) {
     agentes = ags;
     update();
 }
@@ -154,21 +154,21 @@ void VistaEscenario::dibujarCelda(QPainter& painter, int fila, int col) {
 void VistaEscenario::dibujarAgentes(QPainter& painter) {
     if (!agentes) return;
 
-    for (auto agente : *agentes) {
-        dibujarAgente(painter, agente);
+    for (const auto& agente_ptr : *agentes) {
+        dibujarAgente(painter, agente_ptr.get());
     }
 
     // Dibujar también los agentes creados que aún no están en el simulador
-    for (auto agente : agentesCreados) {
+    for (const auto& agente_creado_ptr : agentesCreados) {
         bool yaEnSimulador = false;
-        for (auto a : *agentes) {
-            if (a == agente) {
+        for (const auto& a_ptr : *agentes) {
+            if (a_ptr.get() == agente_creado_ptr.get()) {
                 yaEnSimulador = true;
                 break;
             }
         }
         if (!yaEnSimulador) {
-            dibujarAgente(painter, agente);
+            dibujarAgente(painter, agente_creado_ptr.get());
         }
     }
 }
@@ -351,9 +351,9 @@ void VistaEscenario::aplicarHerramientaPersona(int fila, int col) {
     }
 
     auto persona = factoria->crearPersona(pos, edadAgenteNuevo, movilidadReducidaNuevo);
-    agentesCreados.push_back(persona.get());
+    agentesCreados.push_back(persona);
 
-    emit agenteAgregado(persona.get());
+    emit agenteAgregado(persona);
     update();
 }
 
@@ -373,27 +373,24 @@ void VistaEscenario::aplicarHerramientaRescatista(int fila, int col) {
     }
 
     auto rescatista = factoria->crearRescatista(pos);
-    agentesCreados.push_back(rescatista.get());
+    agentesCreados.push_back(rescatista);
 
-    emit agenteAgregado(rescatista.get());
+    emit agenteAgregado(rescatista);
     update();
 }
 
 void VistaEscenario::aplicarHerramientaBorrar(int fila, int col) {
     QPoint pos(fila, col);
 
-    // Borrar celda del escenario
     escenario->setCelda(fila, col, 0);
 
-    // Borrar agentes en esa posición
     agentesCreados.erase(
         std::remove_if(agentesCreados.begin(), agentesCreados.end(),
-                       [pos](AgenteBase* agente) {
-                           return agente->getPosicion() == pos;
+                       [pos](const std::shared_ptr<AgenteBase>& agente_ptr) {
+                           return agente_ptr->getPosicion() == pos;
                        }),
         agentesCreados.end()
         );
-
     emit escenarioModificado();
     update();
 }

@@ -305,9 +305,9 @@ void VentanaPrincipal::guardarConfiguracion() {
         agenteObj["tipo"] = static_cast<int>(agente->getTipoComportamiento());
 
         // Si es persona, guardar edad
-        if (auto persona = dynamic_cast<Persona*>(agente)) {
-            agenteObj["edad"] = persona->getEdad();
-            agenteObj["movilidadReducida"] = persona->tieneMovilidadReducida();
+        if (const auto persona_ptr = std::dynamic_pointer_cast<Persona>(agente)) {
+            agenteObj["edad"] = persona_ptr->getEdad();
+            agenteObj["movilidadReducida"] = persona_ptr->tieneMovilidadReducida();
         }
 
         agentesArray.append(agenteObj);
@@ -376,17 +376,14 @@ void VentanaPrincipal::abrirConfiguracion() {
         QPoint pos(agenteObj["x"].toInt(), agenteObj["y"].toInt());
         int tipo = agenteObj["tipo"].toInt();
 
-        AgenteBase* nuevoAgente = nullptr;
         if (tipo == static_cast<int>(TipoComportamiento::RESCATISTA)) {
             auto rescatista = factoria->crearRescatista(pos);
-            nuevoAgente = rescatista.get();
-            simulador->agregarAgente(rescatista.get());
+            simulador->agregarAgente(rescatista); // Pasamos el shared_ptr directo!
         } else {
             int edad = agenteObj["edad"].toInt(30);
             bool movilidadReducida = agenteObj["movilidadReducida"].toBool(false);
             auto persona = factoria->crearPersona(pos, edad, movilidadReducida);
-            nuevoAgente = persona.get();
-            simulador->agregarAgente(persona.get());
+            simulador->agregarAgente(persona); // Pasamos el shared_ptr directo!
         }
     }
 

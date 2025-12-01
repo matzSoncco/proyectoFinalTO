@@ -7,6 +7,7 @@
 #include "Escenario.h"
 #include "AgenteBase.h"
 #include "PathFinder.h"
+#include <memory>
 
 class Simulador : public QObject {
     Q_OBJECT //macro obligatoria para que funcionen las señales
@@ -17,7 +18,7 @@ public:
 
     //configuración
     void cargarEscenario(int filas, int cols);
-    void agregarAgente(AgenteBase* agente);
+    void agregarAgente(std::shared_ptr<AgenteBase> agente);
 
     //control
     void iniciar();
@@ -25,7 +26,7 @@ public:
     
     //acceso para la GUI
     Escenario* getEscenario();
-    const std::vector<AgenteBase*>& getAgentes() const;
+    const std::vector<std::shared_ptr<AgenteBase>>& getAgentes() const;
 
 signals:
     //el GUI escuchará esto para saber cuándo repintar la pantalla
@@ -37,7 +38,7 @@ private slots:
 
 private:
     Escenario* escenario;
-    std::vector<AgenteBase*> agentes;
+    std::vector<std::shared_ptr<AgenteBase>> agentes;
     QTimer* timer;
     bool esActivo;
 };

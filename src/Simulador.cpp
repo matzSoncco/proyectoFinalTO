@@ -1,5 +1,5 @@
 #include "../include/Simulador.h"
-#include <QDebug> 
+#include <QDebug>
 
 Simulador::Simulador(QObject *parent) : QObject(parent), escenario(nullptr) {
     timer = new QTimer(this);
@@ -16,7 +16,7 @@ void Simulador::cargarEscenario(int filas, int cols) {
     escenario = new Escenario(filas, cols);
 }
 
-void Simulador::agregarAgente(AgenteBase* agente) {
+void Simulador::agregarAgente(std::shared_ptr<AgenteBase> agente) {
     agentes.push_back(agente);
 }
 
@@ -42,8 +42,9 @@ void Simulador::loopPrincipal() {
     bool alguienSeMovio = false;
     int agentesEnSalida = 0;
 
-    for (AgenteBase* agente : agentes) {
-        QPoint posActual = agente->getPosicion();
+    for (const std::shared_ptr<AgenteBase>& agente_ptr : agentes) {
+        AgenteBase* agente_raw = agente_ptr.get();
+        QPoint posActual = agente_raw->getPosicion();
         
         // 1. Verificar si ya llegó a la salida
         // Usamos .x() y .y() por ser QPoint
@@ -58,7 +59,7 @@ void Simulador::loopPrincipal() {
 
         // 3. Mover al agente
         if (siguientePaso != posActual) {
-            agente->setPosicion(siguientePaso);
+            agente_raw->setPosicion(siguientePaso);
             alguienSeMovio = true; // CORRECCIÓN: Ahora esta variable es útil
         }
     }
@@ -80,6 +81,6 @@ Escenario* Simulador::getEscenario() {
     return escenario;
 }
 
-const std::vector<AgenteBase*>& Simulador::getAgentes() const {
+const std::vector<std::shared_ptr<AgenteBase>>& Simulador::getAgentes() const {
     return agentes;
 }

@@ -8,6 +8,7 @@
 #include "Escenario.h"
 #include "AgenteBase.h"
 #include "FactoriaAgentes.h"
+#include <memory>
 
 /**
  * @brief Enumeración para las herramientas de dibujo
@@ -39,7 +40,7 @@ public:
 
     // Configuración del escenario
     void setEscenario(Escenario* esc);
-    void setAgentes(const std::vector<AgenteBase*>* ags);
+    void setAgentes(const std::vector<std::shared_ptr<AgenteBase>>* ags);
     void setFactoria(FactoriaAgentes* fact);
 
     // Configuración de herramientas
@@ -55,11 +56,12 @@ public:
     void redimensionarEscenario(int filas, int columnas);
 
     // Acceso a agentes creados
-    const std::vector<AgenteBase*>& getAgentesCreados() const { return agentesCreados; }
+    //const std::vector<AgenteBase*>& getAgentesCreados() const { return agentesCreados; }
+    const std::vector<std::shared_ptr<AgenteBase>>& getAgentesCreados() const { return agentesCreados; }
 
 signals:
     void escenarioModificado();
-    void agenteAgregado(AgenteBase* agente);
+    void agenteAgregado(std::shared_ptr<AgenteBase> agente);
     void infoActualizada(const QString& info);
 
 protected:
@@ -100,9 +102,9 @@ private:
 
     // Datos
     Escenario* escenario;
-    const std::vector<AgenteBase*>* agentes;
+    const std::vector<std::shared_ptr<AgenteBase>>* agentes;
     FactoriaAgentes* factoria;
-    std::vector<AgenteBase*> agentesCreados;
+    std::vector<std::shared_ptr<AgenteBase>> agentesCreados;
 
     // Configuración de visualización
     int tamañoCelda;
