@@ -1,4 +1,3 @@
-#include <QCoreApplication>
 #include <QApplication>
 #include "../include/VentanaPrincipal.h"
 #include <QTimer>
@@ -7,12 +6,12 @@
 #include <vector>
 #include <memory>
 
-//el motor
+// Motor
 #include "../include/Simulador.h"
 #include "../include/Escenario.h"
 #include "../include/PathFinder.h"
 
-//los actores
+// Actores
 #include "../include/AgenteBase.h"
 #include "../include/Persona.h"
 #include "../include/Rescatista.h"
@@ -21,63 +20,52 @@
 
 int main(int argc, char *argv[])
 {
-    // Necesario para que funcione el QTimer de tu Simulador
-    QCoreApplication a(argc, argv);
+    // ESTE ES EL ÚNICO LOOP QT PERMITIDO QUE TRABAJAMOS
+    QApplication app(argc, argv);
 
     std::cout << "========================================\n";
     std::cout << "  SIMULADOR INTEGRADO: MOTOR + AGENTES  \n";
     std::cout << "========================================\n\n";
 
     // ---------------------------------------------------------
-    // 1. CONFIGURACIÓN DEL ENTORNO (TU PARTE - LÍDER TÉCNICO)
+    // 1. CONFIGURACIÓN DEL MOTOR
     // ---------------------------------------------------------
     std::cout << "[MOTOR] Inicializando Simulador y Escenario...\n";
-    
-    Simulador* miSimulador = new Simulador(&a);
-    
-    // Creamos un mapa de 20x20 para la prueba
-    miSimulador->cargarEscenario(20, 20);
-    
-    // Ponemos una SALIDA en la esquina (18, 18)
-    // Asumiendo que 2 es el código de salida en tu Escenario.cpp
-    miSimulador->getEscenario()->setCelda(18, 18, 2); 
 
-    // Ponemos un MURO en el medio para probar que tu BFS lo esquiva
+    Simulador* miSimulador = new Simulador(&app);
+
+    // Mapa 20x20
+    miSimulador->cargarEscenario(20, 20);
+
+    // Salida
+    miSimulador->getEscenario()->setCelda(18, 18, 2);
+
+    // Muros
     miSimulador->getEscenario()->setCelda(5, 5, 1);
     miSimulador->getEscenario()->setCelda(5, 6, 1);
     miSimulador->getEscenario()->setCelda(5, 7, 1);
 
     // ---------------------------------------------------------
-    // 2. CREACIÓN DE AGENTES (PARTE DE TU COMPAÑERO)
+    // 2. CREACIÓN DE AGENTES
     // ---------------------------------------------------------
-    std::cout << "[FACTORY] Creando Agentes usando Patrones...\n";
-    
+    std::cout << "[FACTORY] Creando Agentes...\n";
+
     auto gestorEventos = std::make_shared<GestorEventos>();
     FactoriaAgentes factoria;
-    
-    // Creamos una persona en (0,0)
-    // NOTA: Asegúrate que Posicion(x,y) sea compatible o conviértelo a QPoint
+
     auto persona1 = factoria.crearPersona(Posicion(0, 0), 25, false);
     persona1->agregarObservador(gestorEventos);
-    
-    // Creamos un rescatista en (0, 5)
+
     auto rescatista1 = factoria.crearRescatista(Posicion(0, 5));
     rescatista1->agregarObservador(gestorEventos);
 
-    // ---------------------------------------------------------
-    // 3. LA INTEGRACIÓN (AQUÍ SE UNEN LOS DOS MUNDOS)
-    // ---------------------------------------------------------
-    std::cout << "[INTEGRACION] Insertando agentes en el Simulador...\n";
-
-    // En lugar de darles una ruta fija, los metemos al simulador
-    // El simulador calculará la ruta paso a paso con BFS
-    miSimulador->agregarAgente(persona1.get());    // .get() porque tu vector usa punteros raw, o ajusta tu Simulador
+    // Insertarlos en el simulador
+    miSimulador->agregarAgente(persona1.get());
     miSimulador->agregarAgente(rescatista1.get());
 
     // ---------------------------------------------------------
-    // 4. VISUALIZACIÓN DE CONSOLA (PARA VER QUE FUNCIONA)
+    // 3. IMPRIMIR ESTADO EN CONSOLA (podría ser opcional)
     // ---------------------------------------------------------
-    // Conectamos la señal de tu simulador para imprimir el estado
     QObject::connect(miSimulador, &Simulador::mundoActualizado, [&]() {
         // Esto se ejecuta cada vez que el Timer hace tic (cada 500ms)
         
@@ -89,27 +77,21 @@ int main(int argc, char *argv[])
 
         // Condición de victoria simple para cerrar la prueba
         if (miSimulador->getEscenario()->esSalida(posP.x(), posP.y())) {
-            std::cout << "\n[EXITO] ¡La persona llego a la salida usando BFS!\n";
-            QCoreApplication::quit(); // Cierra el programa
+            std::cout << "\n[EXITO] ¡La persona llegó a la salida usando BFS!\n";
+            QApplication::quit();
         }
     });
 
-    // ---------------------------------------------------------
-    // 5. INICIAR MOTOR
-    // ---------------------------------------------------------
-    std::cout << "[MOTOR] Iniciando Loop Principal (QTimer)...\n";
+    // Iniciar motor
+    std::cout << "[MOTOR] Iniciando QTimer...\n";
     miSimulador->iniciar();
 
-    return a.exec(); // Arranca el bucle de eventos de Qt
-
-    QApplication app(argc, argv);
-
-    // Configurar estilo de la aplicación
-    app.setStyle("Fusion");
-
-    // Crear y mostrar la ventana principal
+    // ---------------------------------------------------------
+    // 4. INICIAR EL GUI
+    // ---------------------------------------------------------
     VentanaPrincipal ventana;
     ventana.show();
 
+    // EL ÚNICO RETURN (GUI + MOTOR)
     return app.exec();
 }
