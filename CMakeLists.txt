@@ -16,6 +16,9 @@ set(SOURCES
     src/ObservadorEvento.cpp
     src/FactoriaAgentes.cpp
     src/main.cpp
+    src/Escenario.cpp
+    src/Simulador.cpp
+    src/PathFinder.cpp
 )
 
 # Crear ejecutable
