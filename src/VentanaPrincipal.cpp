@@ -5,6 +5,10 @@
 #include <QJsonArray>
 #include <QFile>
 #include <QTimer>
+#include <QTextEdit>
+#include <QDialog>
+#include <QFont>
+#include <QDebug>
 
 VentanaPrincipal::VentanaPrincipal(QWidget *parent)
     : QMainWindow(parent),
@@ -139,12 +143,24 @@ void VentanaPrincipal::crearPanelEstadisticas() {
     lblEnRuta = new QLabel("En ruta: 0", this);
     lblBloqueados = new QLabel("Bloqueados: 0", this);
     lblTiempoTranscurrido = new QLabel("Tiempo: 0s", this);
+    
+    // Nuevo: resumen de estadísticas en tiempo real
+    lblEstadisticasResumen = new QLabel("Esperando simulación...", this);
+    lblEstadisticasResumen->setWordWrap(true);
+    lblEstadisticasResumen->setStyleSheet("QLabel { color: #0066cc; font-size: 9pt; }");
+    
+    // Botón para ver reporte completo
+    btnVerEstadisticas = new QPushButton("📊 Ver Reporte Completo", this);
+    connect(btnVerEstadisticas, &QPushButton::clicked, this, &VentanaPrincipal::mostrarReporteCompleto);
 
     layout->addWidget(lblTotalAgentes);
     layout->addWidget(lblEvacuados);
     layout->addWidget(lblEnRuta);
     layout->addWidget(lblBloqueados);
     layout->addWidget(lblTiempoTranscurrido);
+    layout->addWidget(new QLabel("─────────────", this));
+    layout->addWidget(lblEstadisticasResumen);
+    layout->addWidget(btnVerEstadisticas);
     layout->addStretch();
 
     panelEstadisticas->setLayout(layout);
@@ -249,8 +265,18 @@ void VentanaPrincipal::conectarSeñales() {
             this, &VentanaPrincipal::actualizarVista);
     connect(simulador, &Simulador::simulacionTerminada,
             this, &VentanaPrincipal::onSimulacionTerminada);
+    connect(simulador, &Simulador::estadisticasActualizadas,
+            this, &VentanaPrincipal::actualizarEstadisticasTexto);
     connect(vistaEscenario, &VistaEscenario::escenarioModificado,
             this, &VentanaPrincipal::actualizarEstadisticas);
+    
+    // CRÍTICO: Conectar señal de agentes agregados desde la vista al simulador
+    connect(vistaEscenario, &VistaEscenario::agenteAgregado,
+            [this](std::shared_ptr<AgenteBase> agente) {
+                simulador->agregarAgente(agente);
+                qDebug() << "🎯 Agente agregado al simulador - ID:" << agente->getId();
+                actualizarEstadisticas();
+            });
 }
 
 void VentanaPrincipal::nuevoEscenario() {
@@ -516,6 +542,55 @@ void VentanaPrincipal::actualizarEstadisticas() {
     lblEvacuados->setText(QString("Evacuados: %1").arg(evacuados));
     lblEnRuta->setText(QString("En ruta: %1").arg(enRuta));
     lblBloqueados->setText(QString("Bloqueados: %1").arg(bloqueados));
+}
+
+void VentanaPrincipal::actualizarEstadisticasTexto(QString resumen) {
+    lblEstadisticasResumen->setText(resumen);
+}
+
+void VentanaPrincipal::mostrarReporteCompleto() {
+    EstadisticasSimulacion* stats = simulador->getEstadisticas();
+    stats->calcularEstadisticas();
+    QString reporte = QString::fromStdString(stats->generarReporte());
+    
+    // Crear diálogo para mostrar el reporte
+    QDialog* dialogo = new QDialog(this);
+    dialogo->setWindowTitle("📊 Reporte Completo de Estadísticas");
+    dialogo->resize(800, 600);
+    
+    QVBoxLayout* layout = new QVBoxLayout(dialogo);
+    
+    QTextEdit* textoReporte = new QTextEdit(dialogo);
+    textoReporte->setReadOnly(true);
+    textoReporte->setPlainText(reporte);
+    textoReporte->setFont(QFont("Courier", 10));
+    
+    QPushButton* btnExportar = new QPushButton("💾 Exportar a Archivo", dialogo);
+    QPushButton* btnCerrar = new QPushButton("Cerrar", dialogo);
+    
+    QHBoxLayout* layoutBotones = new QHBoxLayout();
+    layoutBotones->addWidget(btnExportar);
+    layoutBotones->addStretch();
+    layoutBotones->addWidget(btnCerrar);
+    
+    layout->addWidget(textoReporte);
+    layout->addLayout(layoutBotones);
+    
+    connect(btnCerrar, &QPushButton::clicked, dialogo, &QDialog::accept);
+    connect(btnExportar, &QPushButton::clicked, [this, stats]() {
+        QString archivo = QFileDialog::getSaveFileName(
+            this, "Exportar Estadísticas", "", 
+            "Archivo de Texto (*.txt);;CSV (*.csv);;JSON (*.json)"
+        );
+        if (!archivo.isEmpty()) {
+            stats->exportarReporte(archivo.toStdString());
+            QMessageBox::information(this, "Éxito", 
+                "Estadísticas exportadas correctamente a:\n" + archivo);
+        }
+    });
+    
+    dialogo->exec();
+    delete dialogo;
 }
 
 void VentanaPrincipal::actualizarEstadoBotones(bool simulacionActiva) {

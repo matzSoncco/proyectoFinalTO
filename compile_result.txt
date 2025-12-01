@@ -1,0 +1,41 @@
+==========================================
+  COMPILANDO SIMULADOR DE EVACUACIÓN
+==========================================
+
+[1;33mCompilador encontrado:[0m g++ (GCC) 15.2.1 20251112
+
+Selecciona el método de compilación:
+1) CMake (recomendado)
+2) g++ directo
+Opción [1-2]: 
+[1;33mCompilando con CMake...[0m
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/gocardi/proyectoFinalTO/build
+[  0%] Built target simulador_agentes_autogen_timestamp_deps
+[  6%] Automatic MOC and UIC for target simulador_agentes
+[  6%] Built target simulador_agentes_autogen
+[ 12%] Building CXX object CMakeFiles/simulador_agentes.dir/simulador_agentes_autogen/mocs_compilation.cpp.o
+[ 18%] Building CXX object CMakeFiles/simulador_agentes.dir/src/EstadisticasSimulacion.cpp.o
+[ 25%] Building CXX object CMakeFiles/simulador_agentes.dir/src/FactoriaAgentes.cpp.o
+[ 31%] Building CXX object CMakeFiles/simulador_agentes.dir/src/Persona.cpp.o
+[ 37%] Building CXX object CMakeFiles/simulador_agentes.dir/src/Rescatista.cpp.o
+[ 43%] Building CXX object CMakeFiles/simulador_agentes.dir/src/Simulador.cpp.o
+[ 50%] Building CXX object CMakeFiles/simulador_agentes.dir/src/VentanaPrincipal.cpp.o
+[ 56%] Building CXX object CMakeFiles/simulador_agentes.dir/src/VistaEscenario.cpp.o
+/home/gocardi/proyectoFinalTO/src/VistaEscenario.cpp: In member function ‘void VistaEscenario::dibujarGuias(QPainter&)’:
+/home/gocardi/proyectoFinalTO/src/VistaEscenario.cpp:213:45: aviso: parámetro ‘painter’ sin uso [-Wunused-parameter]
+  213 | void VistaEscenario::dibujarGuias(QPainter& painter) {
+      |                                   ~~~~~~~~~~^~~~~~~
+[ 62%] Building CXX object CMakeFiles/simulador_agentes.dir/src/main.cpp.o
+[ 68%] Linking CXX executable simulador_agentes
+[100%] Built target simulador_agentes
+
+[0;32m✓ Compilación exitosa[0m
+Ejecutable generado: [0;32mbuild/simulador_agentes[0m
+
+¿Deseas ejecutar el programa? [s/n]: 
+==========================================
+  PROCESO COMPLETADO
+==========================================

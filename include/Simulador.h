@@ -3,35 +3,43 @@
 
 #include <QObject>
 #include <QTimer>
+#include <QElapsedTimer>
 #include <vector>
 #include "Escenario.h"
 #include "AgenteBase.h"
 #include "PathFinder.h"
+#include "EstadisticasSimulacion.h"
 #include <memory>
 
 class Simulador : public QObject {
-    Q_OBJECT //macro obligatoria para que funcionen las señales
+    Q_OBJECT
 
 public:
     explicit Simulador(QObject *parent = nullptr);
     ~Simulador();
 
-    //configuración
+    // Configuración
     void cargarEscenario(int filas, int cols);
     void agregarAgente(std::shared_ptr<AgenteBase> agente);
 
-    //control
+    // Control
     void iniciar();
     void pausar();
+    void reiniciar();
     
-    //acceso para la GUI
+    // Acceso para la GUI
     Escenario* getEscenario();
     const std::vector<std::shared_ptr<AgenteBase>>& getAgentes() const;
+    
+    // Estadísticas
+    EstadisticasSimulacion* getEstadisticas();
+    void exportarEstadisticas(const std::string& rutaArchivo);
+    void mostrarEstadisticas();
 
 signals:
-    //el GUI escuchará esto para saber cuándo repintar la pantalla
     void mundoActualizado();
     void simulacionTerminada();
+    void estadisticasActualizadas(QString resumen);
 
 private slots:
     void loopPrincipal();
@@ -40,7 +48,20 @@ private:
     Escenario* escenario;
     std::vector<std::shared_ptr<AgenteBase>> agentes;
     QTimer* timer;
+    QElapsedTimer tiempoTranscurrido;
     bool esActivo;
+    
+    // Sistema de estadísticas
+    EstadisticasSimulacion* estadisticas;
+    std::map<int, int> pasosPorAgente;  // agenteId -> cantidad de pasos
+    std::map<int, QPoint> posicionAnterior;  // Para detectar movimientos
+    double tiempoSimulacion;
+    
+    // Detección de estancamiento
+    int ticksSinMovimiento;
+    int maxTicksSinMovimiento;
+    
+    void detectarEstancamiento();
 };
 
 #endif
