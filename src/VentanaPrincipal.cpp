@@ -418,6 +418,12 @@ void VentanaPrincipal::iniciarSimulacion() {
         return;
     }
 
+    if (simulador->getEscenario()->getSalidaMasCercana(QPoint(0,0)) == QPoint(-1, -1)) {
+        QMessageBox::critical(this, "Error de Configuración",
+                              "¡Debes definir al menos una Salida (🚪) en el mapa!");
+        return; //aborta la simulación si no hay destino
+    }
+
     simulador->iniciar();
     simulacionEnEjecucion = true;
     actualizarEstadoBotones(true);
