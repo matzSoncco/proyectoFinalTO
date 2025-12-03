@@ -8,6 +8,7 @@ class Escenario {
 public:
     int filas;
     int columnas;
+    bool puedeEvacuar(int x, int y);
     //0 = Piso, 1 = Pared, 2 = Salida
     std::vector<std::vector<int>> grid;
 

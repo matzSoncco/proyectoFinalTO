@@ -2,6 +2,7 @@
 #define PERSONA_H
 
 #include "AgenteBase.h"
+#include "Escenario.h"
 
 /**
  * @brief Clase que representa una persona en la simulación
@@ -15,6 +16,7 @@ private:
     double nivelPanico;
     bool movilidadReducida;
     double factorVelocidadBase;
+    Escenario* escenario;
     
 public:
     /**
@@ -66,6 +68,9 @@ public:
     int getEdad() const { return edad; }
     double getNivelPanico() const { return nivelPanico; }
     bool tieneMovilidadReducida() const { return movilidadReducida; }
+    void setEscenario(Escenario* esc);
+    bool verificarLlegadaSalida() const;
+    bool estaCercaDeSalida() const;
     
 private:
     /**

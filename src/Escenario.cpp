@@ -16,6 +16,8 @@ void Escenario::setCelda(int x, int y, int tipo) {
 bool Escenario::esTransitable(int x, int y) {
     //es transitable si esta dentro de los límites y NO es pared (1)
     if (x < 0 || x >= filas || y < 0 || y >= columnas) return false;
+    // CAMBIO IMPORTANTE: Las salidas (2) también son transitables
+    // para permitir que múltiples personas puedan pasar por ellas
     return grid[x][y] != 1;
 }
 
@@ -41,4 +43,8 @@ QPoint Escenario::getSalidaMasCercana(QPoint origen) {
         }
     }
     return mejorSalida;
+}
+
+bool Escenario::puedeEvacuar(int x, int y) {
+    return esSalida(x, y);
 }
