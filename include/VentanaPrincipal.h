@@ -55,6 +55,8 @@ private slots:
 
     // Slots de estadísticas
     void actualizarEstadisticas();
+    void actualizarEstadisticasTexto(QString resumen);
+    void mostrarReporteCompleto();
 
 private:
     // Métodos de inicialización
@@ -109,6 +111,8 @@ private:
     QLabel* lblEnRuta;
     QLabel* lblBloqueados;
     QLabel* lblTiempoTranscurrido;
+    QLabel* lblEstadisticasResumen;
+    QPushButton* btnVerEstadisticas;
 
     // Estado de la aplicación
     bool simulacionEnEjecucion;

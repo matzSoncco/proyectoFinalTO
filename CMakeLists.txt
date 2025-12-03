@@ -27,6 +27,7 @@ set(SOURCES
     src/Escenario.cpp
     src/Simulador.cpp
     src/PathFinder.cpp
+    src/EstadisticasSimulacion.cpp
 
     # Frontend - GUI
     src/VentanaPrincipal.cpp
@@ -44,6 +45,7 @@ set(HEADERS
     include/Escenario.h
     include/Simulador.h
     include/PathFinder.h
+    include/EstadisticasSimulacion.h
     include/VentanaPrincipal.h
     include/VistaEscenario.h
 )

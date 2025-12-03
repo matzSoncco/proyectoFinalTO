@@ -20,7 +20,7 @@ public:
     /**
      * @brief Constructor de Persona
      */
-    Persona(int id, Posicion posInicial, int edad, bool movilidadReducida = false);
+    Persona(int id, Posicion posInicial, int edad = 30, bool movilidadReducida = false);
     
     /**
      * @brief Destructor
