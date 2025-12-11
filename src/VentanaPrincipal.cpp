@@ -464,22 +464,41 @@ void VentanaPrincipal::pausarSimulacion() {
 }
 
 void VentanaPrincipal::reiniciarSimulacion() {
+    // 1. Pausar y limpiar el simulador completamente
     simulador->pausar();
-
-    // Recargar la configuración actual
-    if (!archivoActual.isEmpty()) {
-        // Recargar desde archivo
-        abrirConfiguracion();
-    } else {
-        // Limpiar y permitir crear nuevo escenario
-        vistaEscenario->limpiarAgentes();
+    simulador->reiniciar();
+    
+    // 2. Limpiar la vista del escenario
+    vistaEscenario->limpiarAgentes();
+    
+    // 3. Reiniciar las dimensiones del escenario (mantener el tamaño actual)
+    Escenario* esc = simulador->getEscenario();
+    if (esc) {
+        int filas = esc->filas;
+        int columnas = esc->columnas;
+        simulador->cargarEscenario(filas, columnas);
+        vistaEscenario->setEscenario(simulador->getEscenario());
+        vistaEscenario->setAgentes(&simulador->getAgentes());
     }
-
+    
+    // 4. Reiniciar variables de estado
     simulacionEnEjecucion = false;
     tiempoSimulacion = 0;
+    archivoActual.clear(); // Limpiar referencia al archivo
+    
+    // 5. Actualizar interfaz
     actualizarEstadoBotones(false);
     actualizarEstadisticas();
-    statusBar()->showMessage("Simulación reiniciada.");
+    
+    // 6. Reiniciar etiquetas de estadísticas
+    lblTotalAgentes->setText("Total de agentes: 0");
+    lblEvacuados->setText("Evacuados: 0");
+    lblEnRuta->setText("En ruta: 0");
+    lblBloqueados->setText("Bloqueados: 0");
+    lblTiempoTranscurrido->setText("Tiempo: 0s");
+    lblEstadisticasResumen->setText("Esperando simulación...");
+    
+    statusBar()->showMessage("Todo reiniciado. El escenario está vacío y listo para dibujar.");
 }
 
 void VentanaPrincipal::actualizarVista() {
